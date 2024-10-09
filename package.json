@@ -1,0 +1,59 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@aptos-labs/wallet-adapter-ant-design": "^3.0.0",
+    "@aptos-labs/wallet-adapter-react": "^3.5.0",
+    "@rainbow-me/rainbowkit": "^2.1.4",
+    "@tanstack/react-query": "^5.51.21",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@wagmi/core": "^2.13.3",
+    "crypto-js": "^4.2.0",
+    "ethers": "^5.7.2",
+    "petra-plugin-wallet-adapter": "^0.4.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-responsive-carousel": "^3.2.23",
+    "react-router-dom": "^6.24.1",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^10.0.5",
+    "viem": "^2.19.1",
+    "wagmi": "^2.12.4",
+    "web-vitals": "^2.1.4",
+    "web3": "^4.13.0",
+    "web3modal": "^1.9.12"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.4"
+  }
+}
