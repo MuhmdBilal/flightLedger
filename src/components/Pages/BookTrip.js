@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import CryptoJS from "crypto-js";
 import UserDataOwnershipABI from '../contractabi.json';
 import { ethers } from 'ethers';
 import dubai from '../../assets/cities/dubai.jpeg';
@@ -23,6 +24,9 @@ import dammam from '../../assets/cities/internal/dammam.jpg';
 import taif from '../../assets/cities/internal/taif.jpg';
 import medinah from '../../assets/cities/internal/medina.jpg';
 import planeIcon from '../../assets/icons/book.png';
+import Web3 from "web3";
+import { dataNFTAbi, dataNFTAddress } from '../../utils/dataNFT';
+import { toast } from 'react-toastify';
 const USER_DATA_AND_FLIGHTS_CONTRACT = '0x12811A76dBd05F81e64B48259FDdB4B7bEF40524';
 
 
@@ -58,9 +62,15 @@ const BookTrip = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [tripSuggestions, setTripSuggestions] = useState([]);
-  const [filterType, setFilterType] = useState('internal'); // internal or external
+  const [filterType, setFilterType] = useState('internal');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+ const [date,setDate] = useState("")
+ const [error,setError] = useState(false)
+ const web3 = new Web3(window.ethereum);
+ const dataNFTIntegrateContract = () => {
+  const dataNft_Contract = new web3.eth.Contract(dataNFTAbi, dataNFTAddress);
+  return dataNft_Contract;
+};
   useEffect(() => {
     const init = async () => {
       if (window.ethereum && address && isConnected) {
@@ -81,7 +91,7 @@ const BookTrip = () => {
           from: 'Riyadh',
           to: 'Jeddah',
           date: '2024-09-01',
-          image: jeddah,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/jedah.jpg",
           flightNumber: 'RYD123',
           isInternal: true,
         },
@@ -89,7 +99,7 @@ const BookTrip = () => {
           from: 'Dammam',
           to: 'Medina',
           date: '2024-09-10',
-          image: medinah,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/medina.jpg",
           flightNumber: 'DAM456',
           isInternal: true,
         },
@@ -97,7 +107,7 @@ const BookTrip = () => {
           from: 'Mecca',
           to: 'Taif',
           date: '2024-09-15',
-          image: taif,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/taif.jpg",
           flightNumber: 'MEC789',
           isInternal: true,
         },
@@ -105,7 +115,7 @@ const BookTrip = () => {
           from: 'Jeddah',
           to: 'Riyadh',
           date: '2024-10-05',
-          image: riyadh,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/riadh.jpg",
           flightNumber: 'JED101',
           isInternal: true,
         },
@@ -113,7 +123,7 @@ const BookTrip = () => {
           from: 'Abha',
           to: 'Khobar',
           date: '2024-10-12',
-          image: khobar,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/khobar.jpg",
           flightNumber: 'ABH202',
           isInternal: true,
         },
@@ -121,7 +131,7 @@ const BookTrip = () => {
           from: 'Tabuk',
           to: 'Dammam',
           date: '2024-11-01',
-          image: dammam,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/dammam.jpg",
           flightNumber: 'TBK303',
           isInternal: true,
         },
@@ -129,7 +139,7 @@ const BookTrip = () => {
           from: 'Taif',
           to: 'Medina',
           date: '2024-11-15',
-          image: medinah,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/medina.jpg",
           flightNumber: 'TAF404',
           isInternal: true,
         },
@@ -137,7 +147,7 @@ const BookTrip = () => {
           from: 'Khobar',
           to: 'Mecca',
           date: '2024-12-01',
-          image: mecca,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/mecca.jpg",
           flightNumber: 'KHB505',
           isInternal: true,
         },
@@ -145,7 +155,7 @@ const BookTrip = () => {
           from: 'Riyadh',
           to: 'Abha',
           date: '2024-12-15',
-          image: abha,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/abha.jpg",
           flightNumber: 'RYD606',
           isInternal: true,
         },
@@ -153,7 +163,7 @@ const BookTrip = () => {
           from: 'Jizan',
           to: 'Tabuk',
           date: '2024-12-20',
-          image: tabuk,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmZP4qDoP4NG9y6SkQM5FtmBmeF1Q4UKjeRNx5VUd3S1iv/tabuk.jpg",
           flightNumber: 'JZN707',
           isInternal: true,
         },
@@ -165,7 +175,7 @@ const BookTrip = () => {
           from: 'Riyadh',
           to: 'Dubai',
           date: '2024-09-15',
-          image: dubai,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/dubai.jpeg",
           flightNumber: 'RYD789',
           isInternal: false,
         },
@@ -173,7 +183,7 @@ const BookTrip = () => {
           from: 'Jeddah',
           to: 'Cairo',
           date: '2024-09-20',
-          image: cairo,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/b6.jpg",
           flightNumber: 'JED101',
           isInternal: false,
         },
@@ -181,7 +191,7 @@ const BookTrip = () => {
           from: 'Dammam',
           to: 'London',
           date: '2024-10-05',
-          image: london,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/london.jpg",
           flightNumber: 'DAM202',
           isInternal: false,
         },
@@ -189,7 +199,7 @@ const BookTrip = () => {
           from: 'Medina',
           to: 'Paris',
           date: '2024-10-12',
-          image: paris,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/paris.jpg",
           flightNumber: 'MED303',
           isInternal: false,
         },
@@ -197,7 +207,7 @@ const BookTrip = () => {
           from: 'Riyadh',
           to: 'New York',
           date: '2024-11-01',
-          image: newYork,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/new-york.jpeg",
           flightNumber: 'RYD404',
           isInternal: false,
         },
@@ -205,7 +215,7 @@ const BookTrip = () => {
           from: 'Jeddah',
           to: 'Tokyo',
           date: '2024-11-15',
-          image: tokyo,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/tokyo.jpg",
           flightNumber: 'JED505',
           isInternal: false,
         },
@@ -213,7 +223,7 @@ const BookTrip = () => {
           from: 'Khobar',
           to: 'Berlin',
           date: '2024-12-01',
-          image: berlin,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/berlin.jpg",
           flightNumber: 'KHB606',
           isInternal: false,
         },
@@ -221,7 +231,7 @@ const BookTrip = () => {
           from: 'Tabuk',
           to: 'Sydney',
           date: '2024-12-15',
-          image: sydney,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/sydney.jpg",
           flightNumber: 'TBK707',
           isInternal: false,
         },
@@ -229,7 +239,7 @@ const BookTrip = () => {
           from: 'Abha',
           to: 'Madrid',
           date: '2024-12-20',
-          image: madrid,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/Madrid.jpg",
           flightNumber: 'ABH808',
           isInternal: false,
         },
@@ -237,7 +247,7 @@ const BookTrip = () => {
           from: 'Taif',
           to: 'Toronto',
           date: '2025-01-10',
-          image: toronto,
+          image: "https://aquamarine-ultimate-panda-343.mypinata.cloud/ipfs/QmXZZATEhNZkMhMQDwDNGsFTdR7NK9utACopS6rAMsLvGL/toronto.png",
           flightNumber: 'TAF909',
           isInternal: false,
         },
@@ -260,42 +270,53 @@ const BookTrip = () => {
       [name]: value,
     });
   };
-
+  const secretKey = "Asdzxc9900";
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMessage('');
     setErrorMessage('');
-
-    if (!contract) {
-      console.error('Contract is not initialized');
-      setErrorMessage('Smart contract is not initialized.');
-      setLoading(false);
-      return;
-    }
-
     try {
-      const flightNumberAsInt = parseInt(tripDetails.flightNumber.match(/\d+/)[0], 10);
-      const transaction = await contract.createFlight(
-        tripDetails.from,
-        tripDetails.to,
-        tripDetails.date,
-        tripDetails.isInternal,
-        flightNumberAsInt
-      );
-      await transaction.wait();
-      console.log('Trip booked successfully:', transaction);
-      setSuccessMessage('Trip booked successfully!');
+      const dataNFTContract = dataNFTIntegrateContract();
+      if(!date){
+        setError(true)
+        return
+      }
+      if (address) {
+        const object = {
+          from: tripDetails.from,
+          to: tripDetails.to,
+          date: date,
+          flight: tripDetails.flightNumber
+        };
+        const stringifiedData = JSON.stringify(object);
+        const ciphertext = CryptoJS.AES.encrypt(
+          stringifiedData,
+          secretKey
+        ).toString();
+      const title = `${tripDetails.from} to ${tripDetails.to}`
+        const isUserRegistered = await dataNFTContract.methods.isUserRegistered(address).call();
 
-      // Reset form after successful booking
-      setTripDetails({
-        from: '',
-        to: '',
-        date: '',
-        flightNumber: '',
-        isInternal: filterType === 'internal',
-      });
-      setIsModalOpen(false); // Close the modal after booking
+        if(!isUserRegistered){
+          toast.error("You are not register,please Register first!")
+          return
+        }
+        const getUserRoyaltyFee = await dataNFTContract.methods.getUserRoyaltyFee(address).call();
+        const getUserRole = await dataNFTContract.methods.getUserRole(address).call();
+        if(Number(getUserRole) === 0){
+                await dataNFTContract.methods.create(title, ciphertext,tripDetails.image, Number(getUserRoyaltyFee)).send({ from: address });
+            toast.success('NFT Created successfully.');
+        } else{
+            await dataNFTContract.methods
+            .storeData(title, ciphertext)
+            .send({ from: address });
+            toast.success('Data Created successfully.');
+        }
+
+      }else {
+        toast.error("Please Wallet Connect First!");
+      }
+      setIsModalOpen(false); 
     } catch (error) {
       console.error('Error booking trip:', error);
       setErrorMessage('There was an error booking the trip. Please try again.');
@@ -317,7 +338,7 @@ const BookTrip = () => {
           <img
             src={planeIcon}
             alt="Plane Icon"
-            className="w-10 h-10 mr-16" // Adjust size with `w` and `h` classes
+            className="w-10 h-10 mr-16"
           />
           
         </h2>        <div className="flex justify-center mb-4">
@@ -394,12 +415,12 @@ const BookTrip = () => {
                 type="date"
                 id="date"
                 name="date"
-                value={tripDetails.date}
-                onChange={handleChange}
+                value={date}
+                onChange={(e)=>setDate(e.target.value)}
                 className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-full"
                 required
-                readOnly
               />
+            {error && !date && <span className='text-danger'>Please select date</span>}
             </div>
             <div>
               <label htmlFor="flightNumber" className="block text-sm font-medium text-gray-700">

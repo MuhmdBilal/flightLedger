@@ -55,146 +55,62 @@ const UserRegistrationAndSetup = ({
     e.preventDefault();
 
     try {
-      setLoading(true); 
+      setLoading(true);
       const dataNFTContract = dataNFTIntegrateContract();
       const validatedPrices = {};
-      Object.keys(prices).forEach((attribute) => {
+      const sumOfPrice = Object.keys(prices).reduce((total, attribute) => {
         validatedPrices[attribute] = prices[attribute] || "0";
-      });
-
-      // let parsedFlightPrices = [];
-      // let flightNumbers = [];
-
-      // if (flights && flights.length > 0) {
-      //   const validatedFlightPrices = {};
-      //   Object.keys(flightPrices).forEach((flightNumber) => {
-      //     validatedFlightPrices[flightNumber] = flightPrices[flightNumber] || "0";
-      //   });
-
-      //   parsedFlightPrices = Object.values(validatedFlightPrices).map((price) => {
-      //     return ethers.BigNumber.from(price); // Convert the string to a BigNumber representing wei
-      //   });
-      //   flightNumbers = Object.keys(validatedFlightPrices);
-      // }
+        return total + Number(validatedPrices[attribute]);
+      }, 0);
+      const valueInWei = web3.utils.toWei(sumOfPrice, "ether");
       if (address) {
+        // const isUserRegistered = await dataNFTContract.methods.isUserRegistered(address).call();
+        // if(isUserRegistered){
+        //   toast.error("Wallet address already register, please use another wallet address")
+        //   return
+        // }
+        // const object = {
+        //   username: formData?.username,
+        //   phoneNumber: formData?.phoneNumber,
+        //   location: formData?.location,
+        //   userNamePrice: prices?.username,
+        //   phoneNumberPrice: prices?.phoneNumber,
+        //   locationPrice: prices?.location,
+        //   shareType,
+        // };
+        // const stringifiedData = JSON.stringify(object);
+        const useNameEncrypt = CryptoJS.AES.encrypt(
+          formData?.username,
+          secretKey
+        ).toString();
+        const phoneNumberEncrypt = CryptoJS.AES.encrypt(
+          formData?.phoneNumber,
+          secretKey
+        ).toString();
+        const locationEncrypt = CryptoJS.AES.encrypt(
+          formData?.location,
+          secretKey
+        ).toString();
         if (shareType === "sharing") {
-          const object = {
-            phoneNumber: formData?.phoneNumber,
-            location: formData?.location,
-            userNamePrice: prices?.username,
-            phoneNumberPrice: prices?.phoneNumber,
-            locationPrice: prices?.location,
-            shareType,
-          };
-          const stringifiedData = JSON.stringify(object);
-          const ciphertext = CryptoJS.AES.encrypt(
-            stringifiedData,
-            secretKey
-          ).toString();
-
           await dataNFTContract.methods
-            .storeData(formData?.username, ciphertext)
-            .send({ from: address });
-            toast.success('User registration completed successfully.');
-        } else{
-          if(royaltyFee <25){
-            const object1 = {
-              phoneNumber: formData?.phoneNumber,
-              location: formData?.location,
-              userNamePrice: prices?.username,
-              phoneNumberPrice: prices?.phoneNumber,
-              locationPrice: prices?.location,
-              shareType,
-              royaltyFee
-            };
-            const imageUrl = "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-            const stringifiedData = JSON.stringify(object1);
-            const ciphertext = CryptoJS.AES.encrypt(
-              stringifiedData,
-              secretKey
-            ).toString();
-             await dataNFTContract.methods.create(formData?.username,true, ciphertext,imageUrl, royaltyFee).send({ from: address });
-            toast.success('User registration completed successfully.');
-          } else{
-            toast.error("value must be less than 25")
+            .register(useNameEncrypt, phoneNumberEncrypt, locationEncrypt, 1, 0, valueInWei)
+            .send({ from: address, gas: 500000 });
+          toast.success("User registration completed successfully.");
+        } else {
+          if (royaltyFee > 0 && royaltyFee < 1000) {
+            await dataNFTContract.methods
+              .register(useNameEncrypt, phoneNumberEncrypt, locationEncrypt,0, royaltyFee, valueInWei)
+              .send({ from: address, gas: 500000 });
+            toast.success("User registration completed successfully.");
+          } else {
+            toast.error("value must be greater then 0 and less than 1000");
           }
         }
-        
       } else {
         toast.error("Please Wallet Connect First!");
       }
-      // const parsedRoyaltyFee = royaltyFee ? parseInt(royaltyFee, 10) : 0;
-
-      // Register user and setup preferences
-      // const selectedAttributesArray = selectedAttributes || [];
-      // const priceArray = selectedAttributesArray.map(attr =>
-      //   ethers.BigNumber.from(validatedPrices[attr] || "0") // Treat prices as wei
-      // );
-
-      //  setEncryptedData(ciphertext);
-      // const tx = await contract.storePersonalData(
-
-      //   selectedAttributesArray,
-      //   priceArray,
-      //   shareType === 'tokenization' ? 'tokenizing' : 'sharing'
-      // );
-
-      // const receipt = await tx.wait();
-
-      // if (receipt.status === 1) {
-      //   console.log('User registration completed successfully.');
-
-      //   if (shareType === 'tokenization') {
-      //     console.log('Proceeding to tokenize user data...');
-
-      //     // Calculate the total price of the NFT by summing up all the attribute prices
-      //     const totalPrice = priceArray.reduce((total, price) => total.add(price), ethers.BigNumber.from(0));
-      //     console.log('totalPrice', totalPrice)
-
-      //     await contract.tokenizeUserData(
-      //       selectedAttributesArray,
-      //       parsedRoyaltyFee.toString(),
-      //       totalPrice.toString() // Pass the total price as the third parameter
-      //     );
-      //     console.log('User data tokenized successfully!');
-      //   }
-
-      //   if (flightNumbers.length > 0) {
-      //     for (let flight of flights) {
-      //       if (flightPrices[flight.flightNumber] && flightPrices[flight.flightNumber] !== flight.price) {
-      //         const priceInWei = ethers.BigNumber.from(flightPrices[flight.flightNumber]); // Treat as wei
-      //         const isShared = priceInWei.gt(0); // Set isShared to true if price is greater than 0
-      //         await contract.updateFlight(
-      //           flight.flightNumber,
-      //           flight.from,
-      //           flight.to,
-      //           flight.date,
-      //           flight.isInternal === 'Yes',
-      //           priceInWei,
-      //           isShared // Pass the isShared value to the smart contract
-      //         );
-      //         console.log(`Flight ${flight.flightNumber} updated successfully with price: ${flightPrices[flight.flightNumber]} wei and isShared: ${isShared}`);
-      //       }
-      //     }
-      //   }
-
-      //   // handleSetupPreferences(
-      //   //   selectedAttributes,
-      //   //   validatedPrices,
-      //   //   flightNumbers,
-      //   //   parsedFlightPrices,
-      //   //   shareType === 'tokenization',
-      //   //   parsedRoyaltyFee
-      //   // );
-      // } else {
-      //   console.error('Registration transaction failed:', receipt);
-      //   alert('Registration failed. Please try again.');
-      // }
     } catch (error) {
       console.error("Error during registration and setup:", error);
-      alert(
-        "An error occurred during registration. Please check your inputs and try again."
-      );
     } finally {
       setLoading(false);
     }
@@ -265,7 +181,8 @@ const UserRegistrationAndSetup = ({
                       type="checkbox"
                       checked={selectedAttributes.includes(attribute)}
                       onChange={() => handleAttributeChange(attribute)}
-                    />{" "}
+                      required
+                    />
                     {attribute.charAt(0).toUpperCase() + attribute.slice(1)}
                   </label>
                   <input
@@ -277,6 +194,7 @@ const UserRegistrationAndSetup = ({
                     }
                     disabled={!selectedAttributes.includes(attribute)}
                     className="ml-2 p-1 border rounded"
+                    required
                   />
                 </div>
               ))}

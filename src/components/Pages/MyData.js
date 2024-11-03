@@ -54,9 +54,9 @@ const MyData = () => {
     try {
       setLoading(true);
 
-      console.log('Fetching user data...');
+      // console.log('Fetching user data...');
       const userDataFromContract = await contract.getPersonalData(address);
-      console.log('User data fetched:', userDataFromContract);
+      // console.log('User data fetched:', userDataFromContract);
 
       const userDataFromContractString = {
         owner: userDataFromContract[0],
@@ -66,7 +66,7 @@ const MyData = () => {
         sharingType: userDataFromContract[4],
         attributes: userDataFromContract[5],
         prices: userDataFromContract[6].map(price => {
-          console.log('Price in wei:', price.toString());
+          // console.log('Price in wei:', price.toString());
           return ethers.utils.formatEther(price);
         }),
       };
@@ -79,11 +79,8 @@ const MyData = () => {
         dataPrices[attributes[i]] = ethers.utils.formatEther(userDataFromContract[6][i]);
       }
 
-      console.log('sharingPreferences:', sharingPreferences);
-      console.log('dataPrices:', dataPrices);
-
       const flights = await contract.getFlightsForUser(address);
-      console.log('flights:', flights);
+      // console.log('flights:', flights);
       const formattedFlights = flights.flightNumbers.map((flightNumber, index) => ({
         flightNumber: flightNumber.toString(),
         from: flights.fromLocations[index],
@@ -94,11 +91,11 @@ const MyData = () => {
         isShared: flights.isSharedArray[index] ? 'Shared' : 'Not Shared',
       }));
 
-      console.log('Formatted Flights:', formattedFlights);
+      // console.log('Formatted Flights:', formattedFlights);
 
       // Fetch NFTs data
       const nfts = await nftContract.getNFTsForUser(address);
-      console.log('NFTs:', nfts);
+      // console.log('NFTs:', nfts);
 
       const formattedNFTs = await Promise.all(
         nfts.map(async (tokenId) => {
@@ -116,7 +113,7 @@ const MyData = () => {
         })
       );
 
-      console.log('User NFTs:', formattedNFTs);
+      // console.log('User NFTs:', formattedNFTs);
 
       setUserData({
         ...userDataFromContractString,
@@ -141,13 +138,13 @@ const MyData = () => {
     try {
       setLoading(true);
   
-      console.log('Fetching purchased personal data...');
+      // console.log('Fetching purchased personal data...');
       const purchasedPersonalData = await contract.getPurchasedPersonalData(address, address); // Assuming you are fetching data where the user is both buyer and seller
-      console.log('Purchased personal data:', purchasedPersonalData);
+      // console.log('Purchased personal data:', purchasedPersonalData);
   
-      console.log('Fetching purchased flight data...');
+      // console.log('Fetching purchased flight data...');
       const purchasedFlightData = await contract.getPurchasedFlights(address, address); // Again assuming buyer is same as seller for demonstration
-      console.log('Purchased flight data:', purchasedFlightData);
+      // console.log('Purchased flight data:', purchasedFlightData);
   
       // You can process this data further if needed
       const formattedPurchasedPersonalData = purchasedPersonalData.map((attribute, index) => ({
@@ -160,8 +157,8 @@ const MyData = () => {
         return flight ? { ...flight, price: ethers.utils.formatEther(flight.price) } : null;
       }).filter(Boolean); // Filter out null values
   
-      console.log('Formatted Purchased Personal Data:', formattedPurchasedPersonalData);
-      console.log('Formatted Purchased Flight Data:', formattedPurchasedFlightData);
+      // console.log('Formatted Purchased Personal Data:', formattedPurchasedPersonalData);
+      // console.log('Formatted Purchased Flight Data:', formattedPurchasedFlightData);
   
       // Update your state with the purchased data
       setUserData(prevData => ({
@@ -188,7 +185,7 @@ const MyData = () => {
     try {
       console.log('Checking user registration...');
       const registered = await contract.isUserRegistered(address);
-      console.log('User registration status:', registered);
+      // console.log('User registration status:', registered);
       setIsRegistered(registered);
       localStorage.setItem('isRegistered', registered);
 
@@ -203,7 +200,7 @@ const MyData = () => {
   useEffect(() => {
     const init = async () => {
       if (window.ethereum && address && isConnected) {
-        console.log('Initializing contract...');
+        // console.log('Initializing contract...');
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contractInstance = new ethers.Contract(USER_DATA_AND_FLIGHTS_CONTRACT, UserDataOwnershipABI, signer);
@@ -231,18 +228,18 @@ const MyData = () => {
   }, [contract, nftContract, isRegistered]);
 
   const handleSetupPreferences = async (selectedAttributes, prices, flightNumbers, flightPrices, tokenize, royaltyFee) => {
-    console.log('handleSetupPreferences from my data');
-    console.log('Selected Attributes:', selectedAttributes);
-    console.log('Prices:', prices);
-    console.log('Flight Numbers:', flightNumbers);
-    console.log('Flight Prices:', flightPrices);
-    console.log('Selected sharing type:', tokenize ? 'tokenization' : 'sharing');
-    console.log('Royalty Fee:', royaltyFee);
+    // console.log('handleSetupPreferences from my data');
+    // console.log('Selected Attributes:', selectedAttributes);
+    // console.log('Prices:', prices);
+    // console.log('Flight Numbers:', flightNumbers);
+    // console.log('Flight Prices:', flightPrices);
+    // console.log('Selected sharing type:', tokenize ? 'tokenization' : 'sharing');
+    // console.log('Royalty Fee:', royaltyFee);
 
     if (!contract) return;
 
     try {
-      console.log('Setting up sharing preferences...');
+      // console.log('Setting up sharing preferences...');
 
       if (tokenize) {
         console.log('Calling tokenizeUserData with:', {
@@ -280,9 +277,9 @@ const MyData = () => {
     }
   };
 
-  console.log('Rendering MyData component...');
-  console.log('isRegistered:', isRegistered);
-  console.log('userData:', userData);
+  // console.log('Rendering MyData component...');
+  // console.log('isRegistered:', isRegistered);
+  // console.log('userData:', userData);
 
   const renderCurrentSection = () => {
     switch (currentSection) {
