@@ -54,11 +54,11 @@ const Marketplace = () => {
   const [purchaseLoading, setPurchaseLoading] = useState(false);
   const [delisNftLoading, setDelisNftLoading] = useState(false);
   const [buyNftLoading, setBuyNftLoading] = useState(false);
-  const [personalNFTData,setPersonalNFTData] = useState([]);
-  const [marketPlaceNFTData,setmarketPlaceNFTData] = useState([]);
-  const [persoanlDataListLoading,setPersoanlDataListLoading] = useState(false)
+  const [personalNFTData, setPersonalNFTData] = useState([]);
+  const [marketPlaceNFTData, setmarketPlaceNFTData] = useState([]);
+  const [persoanlDataListLoading, setPersoanlDataListLoading] = useState(false);
   const [loadingAssetId, setLoadingAssetId] = useState(null);
-
+  const [persoanlDataDelistLoading, setPersoanlDeliataListLoading] = useState(false);
   const secretKey = "Asdzxc9900";
   const web3 = new Web3(window.ethereum);
   const dataNFTIntegrateContract = () => {
@@ -111,7 +111,6 @@ const Marketplace = () => {
       //   pricesList,
       //   sharingTypes,
       // ] = await contractInstance.getAllUsersInfo();
-
       // const usersDataArray = owners.map((owner, index) => ({
       //   owner,
       //   username: usernames[index],
@@ -123,7 +122,6 @@ const Marketplace = () => {
       //   ),
       //   sharingType: sharingTypes[index],
       // }));
-
       // setUsersData(usersDataArray);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -212,25 +210,34 @@ const Marketplace = () => {
       const dataNFTContract = dataNFTIntegrateContract();
       const marketContract = marketplaceIntegrateContract();
       if (address) {
-        let marketPlacefNFTArray = []
-        const nextDataId = await dataNFTContract.methods.getDataIds(address).call();
-        const getNFTIds = await dataNFTContract.methods.getNFTIds(address).call();
-        const getAllListedNFTs = await marketContract.methods.getAllListedNFTs().call();
+        let marketPlacefNFTArray = [];
+        const nextDataId = await dataNFTContract.methods
+          .getDataIds(address)
+          .call();
+        const getNFTIds = await dataNFTContract.methods
+          .getNFTIds(address)
+          .call();
+        const getAllListedNFTs = await marketContract.methods
+          .getAllListedNFTs()
+          .call();
         const allUniqueTokenIds = [
           ...new Set([
-            ...getNFTIds.map(id => Number(id)).filter(id => id !== 0 ), 
-            ...getAllListedNFTs.map(id => Number(id)).filter(id => id !== 0) 
-          ])
-        ];        
-        if(allUniqueTokenIds.length){
-          for(let NFTIds of allUniqueTokenIds){
-            const getListing = await marketContract.methods.getListing(dataNFTAddress,NFTIds).call();
-            const getTokenInfo = await dataNFTContract.methods.getTokenInfo(getListing?.seller, NFTIds).call()
-            let price  = Number(getTokenInfo.attributesPrice) / 1e18
-            const name = CryptoJS.AES.decrypt(
-              getTokenInfo.name,
-              secretKey
-            );
+            ...getNFTIds.map((id) => Number(id)).filter((id) => id !== 0),
+            ...getAllListedNFTs
+              .map((id) => Number(id))
+              .filter((id) => id !== 0),
+          ]),
+        ];
+        if (allUniqueTokenIds.length) {
+          for (let NFTIds of allUniqueTokenIds) {
+            const getListing = await marketContract.methods
+              .getListing(dataNFTAddress, NFTIds)
+              .call();
+            const getTokenInfo = await dataNFTContract.methods
+              .getTokenInfo(getListing?.seller, NFTIds)
+              .call();
+            let price = Number(getTokenInfo.attributesPrice) / 1e18;
+            const name = CryptoJS.AES.decrypt(getTokenInfo.name, secretKey);
             const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
             const phoneNo = CryptoJS.AES.decrypt(
               getTokenInfo.phoneNo,
@@ -241,106 +248,138 @@ const Marketplace = () => {
               getTokenInfo.location,
               secretKey
             );
-            const locationDecryptedString = location.toString(CryptoJS.enc.Utf8);
-            if(getTokenInfo.isListed){
-                   const object = {
-                  name: nameDecryptedString,
-                  phoneNo: phoneNoDecryptedString,
-                  location:  locationDecryptedString,
-                  isAccessible: getTokenInfo.isAccessible,
-                  owner: getTokenInfo?.data_Owner,
-                  price: price,
-                  role: Number(getTokenInfo?.role),
-                  id: NFTIds,
-                  royaltyFee: Number(getTokenInfo.royaltyFee),
-                  isListed: getTokenInfo.isListed,
-                  seller: getListing.seller,
-                  sold: getListing.sold,
-                  toWei: Number(getTokenInfo.attributesPrice)
-                };
-                marketPlacefNFTArray.push(object)
-              }
-          }
-        }
-        setmarketPlaceNFTData(marketPlacefNFTArray)
-        //personal data 
-        let NFTArray = []
-        
-        if(getNFTIds.length){
-          for (let j=0;j<getNFTIds.length;j++){
-            const getTokenInfo = await dataNFTContract.methods.getTokenInfo(address, Number(getNFTIds[j])).call()
-            let price  = Number(getTokenInfo.attributesPrice) / 1e18
-            const name = CryptoJS.AES.decrypt(
-              getTokenInfo.name,
-              secretKey
+            const locationDecryptedString = location.toString(
+              CryptoJS.enc.Utf8
             );
-            const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
-            const phoneNo = CryptoJS.AES.decrypt(
-              getTokenInfo.phoneNo,
-              secretKey
-            );
-            const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
-            const location = CryptoJS.AES.decrypt(
-              getTokenInfo.location,
-              secretKey
-            );
-            const locationDecryptedString = location.toString(CryptoJS.enc.Utf8);
-           
-            if(!getTokenInfo.isListed){
+            if (getTokenInfo.isListed) {
               const object = {
                 name: nameDecryptedString,
                 phoneNo: phoneNoDecryptedString,
-                location:  locationDecryptedString,
+                location: locationDecryptedString,
+                isAccessible: getTokenInfo.isAccessible,
+                owner: getTokenInfo?.data_Owner,
+                price: price,
+                role: Number(getTokenInfo?.role),
+                id: NFTIds,
+                royaltyFee: Number(getTokenInfo.royaltyFee),
+                isListed: getTokenInfo.isListed,
+                seller: getListing.seller,
+                sold: getListing.sold,
+                toWei: Number(getTokenInfo.attributesPrice),
+              };
+              marketPlacefNFTArray.push(object);
+            }
+          }
+        }
+        setmarketPlaceNFTData(marketPlacefNFTArray);
+        //personal data
+        let NFTArray = [];
+
+        if (getNFTIds.length) {
+          for (let j = 0; j < getNFTIds.length; j++) {
+            const getTokenInfo = await dataNFTContract.methods
+              .getTokenInfo(address, Number(getNFTIds[j]))
+              .call();
+            let price = Number(getTokenInfo.attributesPrice) / 1e18;
+            const name = CryptoJS.AES.decrypt(getTokenInfo.name, secretKey);
+            const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
+            const phoneNo = CryptoJS.AES.decrypt(
+              getTokenInfo.phoneNo,
+              secretKey
+            );
+            const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
+            const location = CryptoJS.AES.decrypt(
+              getTokenInfo.location,
+              secretKey
+            );
+            const locationDecryptedString = location.toString(
+              CryptoJS.enc.Utf8
+            );
+
+            if (!getTokenInfo.isListed) {
+              const object = {
+                name: nameDecryptedString,
+                phoneNo: phoneNoDecryptedString,
+                location: locationDecryptedString,
                 isAccessible: getTokenInfo.isAccessible,
                 owner: getTokenInfo?.data_Owner,
                 price: price,
                 role: Number(getTokenInfo?.role),
                 id: Number(getNFTIds[j]),
                 royaltyFee: Number(getTokenInfo.royaltyFee),
-                isListed: getTokenInfo.isListed
+                isListed: getTokenInfo.isListed,
               };
               NFTArray.push(object);
-            } 
+            }
           }
           setPersonalNFTData(NFTArray);
         }
-        
+
         let array = [];
-        for (let i = 1; i < Number(nextDataId); i++) {
-          const hasPaidForAccess = await dataNFTContract.methods
-            .hasPaidForAccess(i, address)
-            .call();
-          const getDataInfo = await dataNFTContract.methods
-            .getDataInfo(address, i)
-            .call();
-            let price  = Number(getDataInfo.attributesPrice) / 1e18
-          const name = CryptoJS.AES.decrypt(
-            getDataInfo.name,
-            secretKey
-          );
-          const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
-          const phoneNo = CryptoJS.AES.decrypt(
-            getDataInfo.phoneNo,
-            secretKey
-          );
-          const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
-          const location = CryptoJS.AES.decrypt(
-            getDataInfo.location,
-            secretKey
-          );
-          const locationDecryptedString = location.toString(CryptoJS.enc.Utf8);
-          const object = {
-            name: nameDecryptedString,
-            phoneNo: phoneNoDecryptedString,
-            location:  locationDecryptedString,
-            isAccessible: getDataInfo.isAccessible,
-            owner: getDataInfo?.data_Owner,
-            price: price,
-            role: Number(getDataInfo?.role),
-            id: i,
-          };
-          array.push(object);
-        }
+        // for (let i = 1; i < Number(nextDataId); i++) {
+        //   const hasPaidForAccess = await dataNFTContract.methods
+        //     .hasPaidForAccess(i, address)
+        //     .call();
+        //   const getDataInfo = await dataNFTContract.methods
+        //     .getDataInfo(address, i)
+        //     .call();
+        //     let price  = Number(getDataInfo.attributesPrice) / 1e18
+        //   const name = CryptoJS.AES.decrypt(
+        //     getDataInfo.name,
+        //     secretKey
+        //   );
+        //   const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
+        //   const phoneNo = CryptoJS.AES.decrypt(
+        //     getDataInfo.phoneNo,
+        //     secretKey
+        //   );
+        //   const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
+        //   const location = CryptoJS.AES.decrypt(
+        //     getDataInfo.location,
+        //     secretKey
+        //   );
+        //   const locationDecryptedString = location.toString(CryptoJS.enc.Utf8);
+        //   const object = {
+        //     name: nameDecryptedString,
+        //     phoneNo: phoneNoDecryptedString,
+        //     location:  locationDecryptedString,
+        //     isAccessible: getDataInfo.isAccessible,
+        //     owner: getDataInfo?.data_Owner,
+        //     price: price,
+        //     role: Number(getDataInfo?.role),
+        //     id: i,
+        //   };
+        //   array.push(object);
+        // }
+        const getDataInfo = await dataNFTContract.methods
+          .getDataInfo(address, Number(nextDataId[0]))
+          .call();
+        let locationAmount = Number(getDataInfo.locationAmount) / 1e18;
+        let nameAmount = Number(getDataInfo.nameAmount) / 1e18;
+        let phoneAmount = Number(getDataInfo.phoneAmount) / 1e18;
+        const name = CryptoJS.AES.decrypt(getDataInfo.name, secretKey);
+        const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
+        const phoneNo = CryptoJS.AES.decrypt(getDataInfo.phoneNo, secretKey);
+        const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
+        const location = CryptoJS.AES.decrypt(getDataInfo.location, secretKey);
+        const locationDecryptedString = location.toString(CryptoJS.enc.Utf8);
+        const object = {
+          name: nameDecryptedString,
+          phoneNo: phoneNoDecryptedString,
+          location: locationDecryptedString,
+          isAccessible: getDataInfo.isAccessible,
+          owner: getDataInfo?.data_Owner,
+          locationAmount: locationAmount.toFixed(2),
+          nameAmount: nameAmount.toFixed(2),
+          phoneAmount: phoneAmount.toFixed(2),
+          role: Number(getDataInfo?.role),
+          royaltyFee: 0,
+          isListed: getDataInfo.isListed,
+          toWei: Number(getDataInfo.attributesPrice),
+          id: Number(nextDataId[0]),
+        };
+        array.push(object);
+        console.log("object", object);
         setStoreData(array);
       }
     } catch (e) {
@@ -351,28 +390,44 @@ const Marketplace = () => {
     try {
       const dataNFTContract = dataNFTIntegrateContract();
       const marketContract = marketplaceIntegrateContract();
-      
-      
+
       if (address) {
         let array = [];
-        const walletOfOwner = await dataNFTContract.methods.walletOfOwner(address).call();
-        const getAllListedNFTs = await marketContract.methods.getAllListedNFTs(dataNFTAddress).call();
-      // const allUniqueTokenIds = new Set([
-      //   ...walletOfOwner.map(id => Number(id)).filter(id => id !== 0),   // Filter out 0 values
-      //   ...getAllListedNFTs.map(id => Number(id)).filter(id => id !== 0) // Filter out 0 values
-      // ]);
-      const allUniqueTokenIds = new Set([
-        ...walletOfOwner.map(id => Number(id)).filter(id => id !== 0 && id !== 3),   // Filter out 0 and 3 values
-        ...getAllListedNFTs.map(id => Number(id)).filter(id => id !== 0 && id !== 3) // Filter out 0 and 3 values
-      ]);
+        const walletOfOwner = await dataNFTContract.methods
+          .walletOfOwner(address)
+          .call();
+        const getAllListedNFTs = await marketContract.methods
+          .getAllListedNFTs(dataNFTAddress)
+          .call();
+        // const allUniqueTokenIds = new Set([
+        //   ...walletOfOwner.map(id => Number(id)).filter(id => id !== 0),   // Filter out 0 values
+        //   ...getAllListedNFTs.map(id => Number(id)).filter(id => id !== 0) // Filter out 0 values
+        // ]);
+        const allUniqueTokenIds = new Set([
+          ...walletOfOwner
+            .map((id) => Number(id))
+            .filter((id) => id !== 0 && id !== 3), // Filter out 0 and 3 values
+          ...getAllListedNFTs
+            .map((id) => Number(id))
+            .filter((id) => id !== 0 && id !== 3), // Filter out 0 and 3 values
+        ]);
         for (let tokenId of allUniqueTokenIds) {
-          const getListing = await marketContract.methods.getListing(dataNFTAddress, tokenId).call();
-          const getTokenURI = await dataNFTContract.methods.getTokenURI(tokenId).call();
-          const getTokenInfo = await dataNFTContract.methods.getTokenInfo(tokenId).call();
-          const bytes = CryptoJS.AES.decrypt(getTokenInfo?.description, secretKey);
+          const getListing = await marketContract.methods
+            .getListing(dataNFTAddress, tokenId)
+            .call();
+          const getTokenURI = await dataNFTContract.methods
+            .getTokenURI(tokenId)
+            .call();
+          const getTokenInfo = await dataNFTContract.methods
+            .getTokenInfo(tokenId)
+            .call();
+          const bytes = CryptoJS.AES.decrypt(
+            getTokenInfo?.description,
+            secretKey
+          );
           const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
           const decryptedObject = JSON.parse(decryptedString);
-  
+
           let price = Number(getListing.price) / 1e18;
           const object = {
             title: getTokenInfo.title,
@@ -389,7 +444,7 @@ const Marketplace = () => {
             seller: getListing.seller,
             price: price.toFixed(4), // Set price if listed
           };
-  
+
           // Push the NFT data to the array
           array.push(object);
         }
@@ -423,22 +478,24 @@ const Marketplace = () => {
       setPurchaseLoading(false);
     }
   };
-  const sharingDataListForSale = async(asset)=>{
-    try{
+  const sharingDataListForSale = async (asset) => {
+    try {
       const dataNFTContract = dataNFTIntegrateContract();
       if (address) {
-        setPersoanlDataListLoading(true)
-        await dataNFTContract.methods.toggleDataListing(asset?.id).send({from:address})
+        setPersoanlDataListLoading(true);
+        await dataNFTContract.methods
+          .toggleDataListing(asset?.id)
+          .send({ from: address });
         toast.success("Sharing Data Sale successfully.");
-      }else {
+      } else {
         toast.error("Please Wallet Connect First!");
       }
-    }catch(e){
+    } catch (e) {
       console.log("e", e);
-    } finally{
-      setPersoanlDataListLoading(false)
+    } finally {
+      setPersoanlDataListLoading(false);
     }
-  }
+  };
   useEffect(() => {
     getSharingData();
     // getNFTData();
@@ -455,34 +512,114 @@ const Marketplace = () => {
       flight.isShared === (filterType === "sharing" ? "Shared" : "Not Shared")
     );
   });
+  const sharingDataDelistForSale = async (flight)=>{
+    try{
+      const dataNFTContract = dataNFTIntegrateContract();
+      if (address) {
+        setPersoanlDeliataListLoading(true)
+        const toggleDataDelisting = await dataNFTContract.methods.toggleDataDelisting(flight.id).send({from: address});
+        if(toggleDataDelisting){
+          toast.success("Sharing Data Delsit successfully.")
+          getSharingData();
+        }
+      } else {
+        toast.error("Please Wallet Connect First!");
+      }
+    }catch(e){
+      console.log("e", e);
+    } finally{
+      setPersoanlDeliataListLoading(false)
+    }
+  }
+
   const renderSection = () => {
     if (selectedSection === "personalInfo") {
       return (
         <div className="">
-           {filterType === "sharing" ? (
+          {filterType === "sharing" ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {storeData?.map((flight, index) => (
-                <AssetCard
-                  key={index}
-                  asset={flight}
-                  onSelect={() => setSelectedFlight(flight)}
-                  onPurchase={sharingDataListForSale}
-                  purchaseLoading={persoanlDataListLoading}
-                />
+                <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold mb-2">{flight.title}</h3>
+                    <p>
+                      Name:
+                      {flight.owner === address ? flight.name : "********"}
+                    </p>
+                    <p>
+                      Phone No:
+                      {flight.owner === address ? flight.phoneNo : "********"}
+                    </p>
+                    <p>
+                      Location:
+                      {flight.owner === address ? flight.location : "********"}
+                    </p>
+                    <p>
+                      Name Price:
+                      {flight.owner === address
+                        ? flight.nameAmount
+                        : "********"}
+                      ETH
+                    </p>
+                    <p>
+                      Phone Price:
+                      {flight.owner === address
+                        ? flight.phoneAmount
+                        : "********"}
+                      ETH
+                    </p>
+                    <p>
+                      Location Price:
+                      {flight.owner === address
+                        ? flight.locationAmount
+                        : "********"}
+                      ETH
+                    </p>
+                    <>
+                      {flight.owner === address ? (
+                        <button
+                          type="button"
+                          className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                          onClick={() => {
+                            sharingDataDelistForSale(flight);
+                          }}
+                          disabled={persoanlDataDelistLoading}
+                        >
+                          {persoanlDataDelistLoading
+                            ? "Loading..."
+                            : "Delsit"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                          onClick={() => {
+                            sharingDataListForSale(flight);
+                          }}
+                          disabled={persoanlDataListLoading}
+                        >
+                          {persoanlDataListLoading
+                            ? "Loading..."
+                            : "Buy Now"}
+                        </button>
+                      )}
+                    </>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
             filterType === "tokenizing" && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {personalNFTData?.map((flight) => (
-                <AssetCard
-                  key={flight.flightNumber}
-                  asset={flight}
-                  onSelect={() => setSelectedFlight(flight)}
-                  onPurchase={handleSubmit}
-                  purchaseLoading={loadingAssetId === flight.id}
-                />
-              ))}
+                  <AssetCard
+                    key={flight.flightNumber}
+                    asset={flight}
+                    onSelect={() => setSelectedFlight(flight)}
+                    onPurchase={handleSubmit}
+                    purchaseLoading={loadingAssetId === flight.id}
+                  />
+                ))}
               </div>
             )
           )}
@@ -493,7 +630,7 @@ const Marketplace = () => {
         <div className="">
           {filterType === "sharing" ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {storeData?.map((flight) => (
+              {/* {storeData?.map((flight) => (
                 <AssetCard
                   key={flight.flightNumber}
                   asset={flight}
@@ -501,7 +638,7 @@ const Marketplace = () => {
                   onPurchase={purchaseSgaringData}
                   purchaseLoading={purchaseLoading}
                 />
-              ))}
+              ))} */}
             </div>
           ) : (
             filterType === "tokenizing" && (
@@ -524,37 +661,32 @@ const Marketplace = () => {
                       <p>Price: {flight.price} ETH</p>
                       <p>RoyaltycFee: {flight.royaltyFee} </p>
                       <>
-                          {
-                            flight?.seller === address ? (
-                              <>
-                              {
-                                !flight?.sold && (
-                                  <button
-                              type="button"
-                              className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
-                              onClick={() => {
-                                nftDelist(flight.id)
-                              }}
-                            >
-                              {delisNftLoading ? "Loading...": "Delist"} 
-                            </button>
-                                )
-                              }
-                              </>
-                            ) : (
+                        {flight?.seller === address ? (
+                          <>
+                            {!flight?.sold && (
                               <button
-                              type="button"
-                              className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
-                              onClick={() => {
-                                buyDataNFT(flight)
-                              }}
-                            >
-                              {buyNftLoading ? "Loading..." :"Buy NFT"}
-                            </button>
-                            )
-                          }
+                                type="button"
+                                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                                onClick={() => {
+                                  nftDelist(flight.id);
+                                }}
+                              >
+                                {delisNftLoading ? "Loading..." : "Delist"}
+                              </button>
+                            )}
                           </>
-                      
+                        ) : (
+                          <button
+                            type="button"
+                            className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                            onClick={() => {
+                              buyDataNFT(flight);
+                            }}
+                          >
+                            {buyNftLoading ? "Loading..." : "Buy NFT"}
+                          </button>
+                        )}
+                      </>
                     </div>
                   </div>
                 ))}
@@ -602,7 +734,7 @@ const Marketplace = () => {
       if (address) {
         await marketContract.methods
           .buyTokenNFT(dataNFTAddress, flight?.id)
-          .send({ from: address,value: flight?.toWei,gas: 500000 });
+          .send({ from: address, value: flight?.toWei, gas: 500000 });
         toast.success("NFT Buy successfully.");
         // getNFTData()
         getSharingData();
@@ -637,7 +769,7 @@ const Marketplace = () => {
   const handleSubmit = async (assets) => {
     try {
       console.log("assets", assets);
-      
+
       setLoadingAssetId(assets.id); // Set loading state for the specific asset
       const dataNFTContract = dataNFTIntegrateContract();
       const marketContract = marketplaceIntegrateContract();
@@ -658,7 +790,7 @@ const Marketplace = () => {
     } finally {
       setLoadingAssetId(null); // Clear loading state
     }
-};
+  };
   return (
     <div className="bg-gradient-to-r from-purple-200 to-gray-500 min-h-screen flex flex-col">
       <div className="bg-gradient-to-r from-purple-200 to-gray-500 main-content flex">
@@ -704,7 +836,6 @@ const Marketplace = () => {
             >
               Sharing Data
             </button>
-            
           </div>
 
           {renderSection()}
