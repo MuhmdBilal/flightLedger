@@ -283,35 +283,36 @@ const BookTrip = () => {
         return
       }
       if (address) {
-        const object = {
-          from: tripDetails.from,
-          to: tripDetails.to,
-          date: date,
-          flight: tripDetails.flightNumber
-        };
-        const stringifiedData = JSON.stringify(object);
+        // const object = {
+        //   from: tripDetails.from,
+        //   to: tripDetails.to,
+        //   date: date,
+        //   flight: tripDetails.flightNumber
+        // };
+        const stringifiedData = JSON.stringify(tripDetails.flightNumber);
         const ciphertext = CryptoJS.AES.encrypt(
           stringifiedData,
           secretKey
         ).toString();
       const title = `${tripDetails.from} to ${tripDetails.to}`
-        const isUserRegistered = await dataNFTContract.methods.isUserRegistered(address).call();
+        const isUserRegistered = await dataNFTContract.methods.isRegistered(address).call();
 
         if(!isUserRegistered){
           toast.error("You are not register,please Register first!")
           return
         }
-        const getUserRoyaltyFee = await dataNFTContract.methods.getUserRoyaltyFee(address).call();
-        const getUserRole = await dataNFTContract.methods.getUserRole(address).call();
-        if(Number(getUserRole) === 0){
-                await dataNFTContract.methods.create(title, ciphertext,tripDetails.image, Number(getUserRoyaltyFee)).send({ from: address });
-            toast.success('NFT Created successfully.');
-        } else{
-            await dataNFTContract.methods
-            .storeData(title, ciphertext)
-            .send({ from: address });
-            toast.success('Data Created successfully.');
-        }
+        // const getUserRoyaltyFee = await dataNFTContract.methods.getUserRoyaltyFee(address).call();
+        // const getUserRole = await dataNFTContract.methods.getUserRole(address).call();
+        await dataNFTContract.methods.create(title, date,ciphertext,tripDetails.image).send({ from: address });
+        toast.success('NFT Created successfully.');
+        // if(Number(getUserRole) === 0){
+        //     toast.success('NFT Created successfully.');
+        // } else{
+        //     await dataNFTContract.methods
+        //     .storeData(title, ciphertext)
+        //     .send({ from: address });
+        //     toast.success('Data Created successfully.');
+        // }
 
       }else {
         toast.error("Please Wallet Connect First!");

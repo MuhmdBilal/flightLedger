@@ -1,5 +1,5 @@
 export const dataSellingMarketplaceAddress =
-  "0xce095d708ee80fd623A39cd2D25fdA2697Ab43d0";
+  "0x4AfB04603eE7af06F8539269BcC591a1397EDf83";
 export const dataSellingMarketplaceAbi = [
   {
     inputs: [{ internalType: "address", name: "_contract", type: "address" }],
@@ -136,6 +136,13 @@ export const dataSellingMarketplaceAbi = [
   },
   {
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "allListedCreatedNFTs",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "allListedNFTs",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
@@ -190,15 +197,22 @@ export const dataSellingMarketplaceAbi = [
   },
   {
     inputs: [],
-    name: "getAllListedNFTs",
+    name: "getAllListedCreatedNFTs",
     outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "getAllListedNFTsLength",
+    name: "getAllListedCreatedNFTsLength",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllListedNFTs",
+    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
     stateMutability: "view",
     type: "function",
   },
@@ -216,6 +230,13 @@ export const dataSellingMarketplaceAbi = [
       { internalType: "uint256", name: "timestamp", type: "uint256" },
       { internalType: "bool", name: "isListed", type: "bool" },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "user", type: "address" }],
+    name: "getUserListedCreatedNFTs",
+    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
     stateMutability: "view",
     type: "function",
   },
@@ -280,10 +301,27 @@ export const dataSellingMarketplaceAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "address", name: "_contract", type: "address" }],
+    name: "setDataContract",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "address", name: "newOwner", type: "address" }],
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "userListedCreatedNFTs",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
     type: "function",
   },
   {

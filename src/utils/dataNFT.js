@@ -1,10 +1,6 @@
-export const dataNFTAddress = "0x70eB7709e68b23E7De94A14c2dC513155e6Ceb8E";
+export const dataNFTAddress = "0xdBA1281fe54B33735829ccA0d0b8cD0BDe41394f";
 export const dataNFTAbi = [
-  {
-    inputs: [{ internalType: "uint96", name: "feeNumerator", type: "uint96" }],
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   {
     anonymous: false,
     inputs: [
@@ -152,19 +148,6 @@ export const dataNFTAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "Paused",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
       { indexed: true, internalType: "address", name: "from", type: "address" },
       { indexed: true, internalType: "address", name: "to", type: "address" },
       {
@@ -175,19 +158,6 @@ export const dataNFTAbi = [
       },
     ],
     name: "Transfer",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "Unpaused",
     type: "event",
   },
   {
@@ -296,6 +266,13 @@ export const dataNFTAbi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getListedDataIds",
+    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "address", name: "user", type: "address" }],
     name: "getNFTIds",
     outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
@@ -354,6 +331,18 @@ export const dataNFTAbi = [
     inputs: [{ internalType: "address", name: "user", type: "address" }],
     name: "getUserCreatedItems",
     outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_id", type: "uint256" }],
+    name: "getUserDetails",
+    outputs: [
+      { internalType: "string", name: "title", type: "string" },
+      { internalType: "string", name: "date", type: "string" },
+      { internalType: "string", name: "flightNo", type: "string" },
+      { internalType: "bool", name: "isListed", type: "bool" },
+    ],
     stateMutability: "view",
     type: "function",
   },
@@ -469,6 +458,13 @@ export const dataNFTAbi = [
     type: "function",
   },
   {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "listeddataIds",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "marketplaceContract",
     outputs: [{ internalType: "address", name: "", type: "address" }],
@@ -507,20 +503,6 @@ export const dataNFTAbi = [
     inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
     name: "ownerOf",
     outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "pause",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "paused",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
@@ -635,28 +617,11 @@ export const dataNFTAbi = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "_uri", type: "string" }],
-    name: "setPrefixURI",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       { internalType: "address", name: "_receiver", type: "address" },
       { internalType: "uint96", name: "_royaltyFeesInBips", type: "uint96" },
     ],
     name: "setRoyaltyInfo",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "string", name: "_uri", type: "string" },
-      { internalType: "uint256", name: "_tokenId", type: "uint256" },
-    ],
-    name: "setTokenURI",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -739,8 +704,27 @@ export const dataNFTAbi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "unPause",
+    inputs: [
+      { internalType: "address", name: "_previousOwner", type: "address" },
+      { internalType: "address", name: "_userAddress", type: "address" },
+      { internalType: "uint256", name: "_tokenId", type: "uint256" },
+      { internalType: "string", name: "_title", type: "string" },
+      { internalType: "string", name: "_date", type: "string" },
+      { internalType: "string", name: "_flightNo", type: "string" },
+      { internalType: "bool", name: "_isListed", type: "bool" },
+    ],
+    name: "updateCreatedUserData",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "previousOwner", type: "address" },
+      { internalType: "address", name: "newOwner", type: "address" },
+      { internalType: "uint256", name: "tokenId", type: "uint256" },
+    ],
+    name: "updateTokenInfo",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -752,6 +736,16 @@ export const dataNFTAbi = [
       { internalType: "bool", name: "isListed", type: "bool" },
     ],
     name: "updateTokenInfoIsListed",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "_id", type: "uint256" },
+      { internalType: "bool", name: "_isListed", type: "bool" },
+    ],
+    name: "updateUser",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
