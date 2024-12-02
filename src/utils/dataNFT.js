@@ -1,6 +1,10 @@
-export const dataNFTAddress = "0xdBA1281fe54B33735829ccA0d0b8cD0BDe41394f";
+export const dataNFTAddress = "0x360AF3B45D29ee1e5bA77eF850b90DfDb0ddE055";
 export const dataNFTAbi = [
-  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  {
+    inputs: [{ internalType: "uint96", name: "feeNumerator", type: "uint96" }],
+    stateMutability: "nonpayable",
+    type: "constructor",
+  },
   {
     anonymous: false,
     inputs: [
@@ -341,6 +345,7 @@ export const dataNFTAbi = [
       { internalType: "string", name: "title", type: "string" },
       { internalType: "string", name: "date", type: "string" },
       { internalType: "string", name: "flightNo", type: "string" },
+      { internalType: "uint96", name: "royaltyFee", type: "uint96" },
       { internalType: "bool", name: "isListed", type: "bool" },
     ],
     stateMutability: "view",
@@ -356,6 +361,7 @@ export const dataNFTAbi = [
       { internalType: "string", name: "title", type: "string" },
       { internalType: "string", name: "date", type: "string" },
       { internalType: "string", name: "flightNo", type: "string" },
+      { internalType: "uint96", name: "_royaltyFee", type: "uint96" },
       { internalType: "bool", name: "isListed", type: "bool" },
     ],
     stateMutability: "view",
@@ -627,6 +633,17 @@ export const dataNFTAbi = [
     type: "function",
   },
   {
+    inputs: [
+      { internalType: "uint256", name: "tokenId", type: "uint256" },
+      { internalType: "address", name: "_receiver", type: "address" },
+      { internalType: "uint96", name: "_royaltyFeesInBips", type: "uint96" },
+    ],
+    name: "setRoyaltyInfoOfUser",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [{ internalType: "bytes4", name: "interfaceId", type: "bytes4" }],
     name: "supportsInterface",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
@@ -711,6 +728,7 @@ export const dataNFTAbi = [
       { internalType: "string", name: "_title", type: "string" },
       { internalType: "string", name: "_date", type: "string" },
       { internalType: "string", name: "_flightNo", type: "string" },
+      { internalType: "uint96", name: "_royaltyFee", type: "uint96" },
       { internalType: "bool", name: "_isListed", type: "bool" },
     ],
     name: "updateCreatedUserData",

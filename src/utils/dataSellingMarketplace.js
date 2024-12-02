@@ -1,5 +1,5 @@
 export const dataSellingMarketplaceAddress =
-  "0x4AfB04603eE7af06F8539269BcC591a1397EDf83";
+  "0xe3dA02dE6F5cB2C08eB84D205D375B8FC087771A";
 export const dataSellingMarketplaceAbi = [
   {
     inputs: [{ internalType: "address", name: "_contract", type: "address" }],
@@ -252,6 +252,7 @@ export const dataSellingMarketplaceAbi = [
       { internalType: "address", name: "nftContract", type: "address" },
       { internalType: "uint256", name: "tokenId", type: "uint256" },
       { internalType: "uint256", name: "price", type: "uint256" },
+      { internalType: "uint96", name: "royaltyfee", type: "uint96" },
     ],
     name: "listCreatedInfoNFT",
     outputs: [],

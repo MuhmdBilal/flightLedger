@@ -56,12 +56,12 @@ const Marketplace = () => {
   const [buyNftLoading, setBuyNftLoading] = useState(null);
   const [personalNFTData, setPersonalNFTData] = useState([]);
   const [marketPlaceNFTData, setmarketPlaceNFTData] = useState([]);
-  const [persoanlDataListLoading, setPersoanlDataListLoading] = useState(false);
+  const [persoanlDataListLoading, setPersoanlDataListLoading] = useState(null);
   const [loadingAssetId, setLoadingAssetId] = useState(null);
-  const [flightDelistLoading,setFlightDelistLoading] = useState(false);
-  const [flightBuyLoading,setFlightBuyLoading]= useState(false);
+  const [flightDelistLoading, setFlightDelistLoading] = useState(null);
+  const [flightBuyLoading, setFlightBuyLoading] = useState(null);
   const [persoanlDataDelistLoading, setPersoanlDeliataListLoading] =
-    useState(false);
+    useState(null);
   const secretKey = "Asdzxc9900";
   const web3 = new Web3(window.ethereum);
   const dataNFTIntegrateContract = () => {
@@ -130,11 +130,10 @@ const Marketplace = () => {
       console.error("Error fetching user data:", error);
     }
   };
- 
+
   const fetchAllFlights = async (contractInstance) => {
     try {
       // const flightNumbersSet = new Set();
-
       // const [
       //   owners,
       //   flightNumbers,
@@ -145,12 +144,10 @@ const Marketplace = () => {
       //   prices,
       //   isSharedArray,
       // ] = await contractInstance.getAllFlightsInfo();
-
       // const uniqueFlights = flightNumbers
       //   .map((flightNumber, index) => {
       //     if (!flightNumbersSet.has(flightNumber.toString())) {
       //       flightNumbersSet.add(flightNumber.toString());
-
       //       return {
       //         flightNumber: flightNumber.toString(),
       //         owner: owners[index],
@@ -165,7 +162,6 @@ const Marketplace = () => {
       //     return null;
       //   })
       //   .filter((flight) => flight !== null);
-
       // setFlights(uniqueFlights);
     } catch (error) {
       console.error("Error fetching flights:", error);
@@ -236,12 +232,12 @@ const Marketplace = () => {
             const getListing = await marketContract.methods
               .getListing(dataNFTAddress, NFTIds)
               .call();
+
             const getTokenInfo = await dataNFTContract.methods
               .getTokenInfo(getListing?.seller, NFTIds)
               .call();
-              console.log("getTokenInfo.phoneAmount", getTokenInfo);
-              
-              let locationAmount = Number(getTokenInfo.locationAmount) / 1e18;
+
+            let locationAmount = Number(getTokenInfo.locationAmount) / 1e18;
             let nameAmount = Number(getTokenInfo.nameAmount) / 1e18;
             let phoneAmount = Number(getTokenInfo.phoneNoAmount) / 1e18;
             let price = Number(getTokenInfo.attributesPrice) / 1e18;
@@ -283,47 +279,6 @@ const Marketplace = () => {
         }
         setmarketPlaceNFTData(marketPlacefNFTArray);
         //personal data
-        let NFTArray = [];
-
-        // if (getNFTIds.length) {
-        //   for (let j = 0; j < getNFTIds.length; j++) {
-        //     const getTokenInfo = await dataNFTContract.methods
-        //       .getTokenInfo(address, Number(getNFTIds[j]))
-        //       .call();
-        //     let price = Number(getTokenInfo.attributesPrice) / 1e18;
-        //     const name = CryptoJS.AES.decrypt(getTokenInfo.name, secretKey);
-        //     const nameDecryptedString = name.toString(CryptoJS.enc.Utf8);
-        //     const phoneNo = CryptoJS.AES.decrypt(
-        //       getTokenInfo.phoneNo,
-        //       secretKey
-        //     );
-        //     const phoneNoDecryptedString = phoneNo.toString(CryptoJS.enc.Utf8);
-        //     const location = CryptoJS.AES.decrypt(
-        //       getTokenInfo.location,
-        //       secretKey
-        //     );
-        //     const locationDecryptedString = location.toString(
-        //       CryptoJS.enc.Utf8
-        //     );
-
-        //     if (!getTokenInfo.isListed) {
-        //       const object = {
-        //         name: nameDecryptedString,
-        //         phoneNo: phoneNoDecryptedString,
-        //         location: locationDecryptedString,
-        //         isAccessible: getTokenInfo.isAccessible,
-        //         owner: getTokenInfo?.data_Owner,
-        //         price: price,
-        //         role: Number(getTokenInfo?.role),
-        //         id: Number(getNFTIds[j]),
-        //         royaltyFee: Number(getTokenInfo.royaltyFee),
-        //         isListed: getTokenInfo.isListed,
-        //       };
-        //       NFTArray.push(object);
-        //     }
-        //   }
-        //   setPersonalNFTData(NFTArray);
-        // }
 
         let array = [];
         // data sharing
@@ -341,6 +296,8 @@ const Marketplace = () => {
             const getDataInfo = await dataNFTContract.methods
               .getDataInfo(getDataOwner, Number(sharingIds))
               .call();
+            const hasPaidForAccess = await dataNFTContract.methods.hasPaidForAccess(Number(sharingIds), address).call();
+            
             let locationAmount = Number(getDataInfo.locationAmount) / 1e18;
             let nameAmount = Number(getDataInfo.nameAmount) / 1e18;
             let phoneAmount = Number(getDataInfo.phoneAmount) / 1e18;
@@ -374,19 +331,20 @@ const Marketplace = () => {
                 toWei: Number(getDataInfo.attributesPrice),
                 id: sharingIds,
                 viewStoredData: viewStoredData,
+                hasPaidForAccess: hasPaidForAccess
               };
               array.push(object);
-              // console.log("object", object);
             }
           }
         }
-
+    
         setStoreData(array);
       }
     } catch (e) {
       console.log("e", e);
     }
   };
+
   const getNFTData = async () => {
     try {
       const dataNFTContract = dataNFTIntegrateContract();
@@ -395,22 +353,21 @@ const Marketplace = () => {
       if (address) {
         let array = [];
         const getAllListedNFTs = await marketContract.methods
-        .getAllListedCreatedNFTs().call();
+          .getAllListedCreatedNFTs()
+          .call();
         for (let tokenId of getAllListedNFTs) {
           const getListing = await marketContract.methods
             .getListing(dataNFTAddress, Number(tokenId))
             .call();
-            
+
           const getTokenURI = await dataNFTContract.methods
             .getTokenURI(Number(tokenId))
             .call();
           const getTokenInfo = await dataNFTContract.methods
-            .getUserInfo(getListing.seller,Number(tokenId))
+            .getUserInfo(getListing.seller, Number(tokenId))
             .call();
-          const bytes = CryptoJS.AES.decrypt(
-            getTokenInfo?.flightNo,
-            secretKey
-          );
+
+          const bytes = CryptoJS.AES.decrypt(getTokenInfo?.flightNo, secretKey);
           const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
           let price = Number(getListing.price) / 1e18;
           const object = {
@@ -425,7 +382,8 @@ const Marketplace = () => {
             sold: getListing.sold,
             seller: getListing.seller,
             price: price.toFixed(4),
-            toWeiPrice: Number(getListing.price)
+            toWeiPrice: Number(getListing.price),
+            royaltyFee: Number(getTokenInfo._royaltyFee),
           };
           array.push(object);
         }
@@ -468,7 +426,7 @@ const Marketplace = () => {
           (parseFloat(asset.phoneAmount) || 0) +
           (parseFloat(asset.locationAmount) || 0);
         const valueInWei = web3.utils.toWei(totalPrice, "ether");
-        setPersoanlDataListLoading(true);
+        setPersoanlDataListLoading(asset?.id);
         await dataNFTContract.methods
           .payForAccess(asset?.id)
           .send({ from: address, value: valueInWei });
@@ -479,7 +437,7 @@ const Marketplace = () => {
     } catch (e) {
       console.log("e", e);
     } finally {
-      setPersoanlDataListLoading(false);
+      setPersoanlDataListLoading(null);
     }
   };
   useEffect(() => {
@@ -501,7 +459,7 @@ const Marketplace = () => {
     try {
       const dataNFTContract = dataNFTIntegrateContract();
       if (address) {
-        setPersoanlDeliataListLoading(true);
+        setPersoanlDeliataListLoading(flight.id);
         const toggleDataDelisting = await dataNFTContract.methods
           .toggleDataDelisting(flight.id)
           .send({ from: address });
@@ -515,9 +473,10 @@ const Marketplace = () => {
     } catch (e) {
       console.log("e", e);
     } finally {
-      setPersoanlDeliataListLoading(false);
+      setPersoanlDeliataListLoading(null);
     }
   };
+  
   const renderSection = () => {
     if (selectedSection === "personalInfo") {
       return (
@@ -530,15 +489,15 @@ const Marketplace = () => {
                     <h3 className="text-lg font-bold mb-2">{flight.title}</h3>
                     <p>
                       Name:
-                      {flight.owner === address ? flight.name : "********"}
+                      {flight.owner === address ? flight.name : flight.hasPaidForAccess ? flight.name : "********"}
                     </p>
                     <p>
                       Phone No:
-                      {flight.owner === address ? flight.phoneNo : "********"}
+                      {flight.owner === address ? flight.phoneNo : flight.hasPaidForAccess ? flight.phoneNo :"********"}
                     </p>
                     <p>
                       Location:
-                      {flight.owner === address ? flight.location : "********"}
+                      {flight.owner === address ? flight.location : flight.hasPaidForAccess ? flight.location : "********"}
                     </p>
                     <p>
                       Name Price:
@@ -572,9 +531,9 @@ const Marketplace = () => {
                           onClick={() => {
                             sharingDataDelistForSale(flight);
                           }}
-                          disabled={persoanlDataDelistLoading}
+                          disabled={!!persoanlDataDelistLoading}
                         >
-                          {persoanlDataDelistLoading ? "Loading..." : "Delsit"}
+                          {persoanlDataDelistLoading == flight.id ? "Loading..." : "Delsit"}
                         </button>
                       ) : (
                         <>
@@ -585,9 +544,9 @@ const Marketplace = () => {
                               onClick={() => {
                                 sharingDataListForSale(flight);
                               }}
-                              disabled={persoanlDataListLoading}
+                              disabled={!!persoanlDataListLoading}
                             >
-                              {persoanlDataListLoading
+                              {persoanlDataListLoading == flight.id
                                 ? "Loading..."
                                 : "Buy Now"}
                             </button>
@@ -602,38 +561,46 @@ const Marketplace = () => {
           ) : (
             filterType === "tokenizing" && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 {marketPlaceNFTData?.map((flight, index) => (
+                {marketPlaceNFTData?.map((flight, index) => (
                   <div
                     key={index}
                     className="bg-white shadow-md rounded-lg overflow-hidden"
                   >
                     <div className="p-4">
                       <h3 className="text-lg font-bold mb-2">{flight.title}</h3>
-                      <p>Name: {flight.seller === address ? flight.name: "********"}</p>
-                      <p>Phone No: {flight.seller === address ?flight.phoneNo: "********"}</p>
-                      <p>Location: {flight.seller === address ?flight.location: "********"} ETH</p>
                       <p>
-                      Name Price:
-                      {flight.seller === address 
-                        ? flight.nameAmount
-                        : "********"}
-                      ETH
-                    </p>
-                    <p>
-                      Phone Price:
-                      {flight.seller === address 
-                        ? flight.phoneAmount
-                        : "********"}
-                      ETH
-                    </p>
-                    <p>
-                      Location Price:
-                      {flight.seller === address 
-                        ? flight.locationAmount
-                        : "********"}
-                      ETH
-                    </p>
-                      <p>RoyaltycFee: {flight.seller === address ? flight.royaltyFee : "********"} %</p>
+                        Name:{" "}
+                        {flight.seller === address ? flight.name : "********"}
+                      </p>
+                      <p>
+                        Phone No:{" "}
+                        {flight.seller === address
+                          ? flight.phoneNo
+                          : "********"}
+                      </p>
+                      <p>
+                        Location:{" "}
+                        {flight.seller === address
+                          ? flight.location
+                          : "********"}{" "}
+                        ETH
+                      </p>
+                      <p>
+                        Name Price:
+                        {flight.nameAmount}
+                        ETH
+                      </p>
+                      <p>
+                        Phone Price:
+                        {flight.phoneAmount}
+                        ETH
+                      </p>
+                      <p>
+                        Location Price:
+                        {flight.locationAmount}
+                        ETH
+                      </p>
+                      <p>Royalty Fee: {flight.royaltyFee/100}%</p>
                       <>
                         {flight?.seller === address ? (
                           <>
@@ -646,7 +613,9 @@ const Marketplace = () => {
                                 }}
                                 disabled={!!delisNftLoading}
                               >
-                                {delisNftLoading == flight.id? "Loading..." : "Delist"}
+                                {delisNftLoading == flight.id
+                                  ? "Loading..."
+                                  : "Delist"}
                               </button>
                             )}
                           </>
@@ -659,7 +628,9 @@ const Marketplace = () => {
                             }}
                             disabled={!!buyNftLoading}
                           >
-                            {buyNftLoading == flight.id ? "Loading..." : "Buy NFT"}
+                            {buyNftLoading == flight.id
+                              ? "Loading..."
+                              : "Buy NFT"}
                           </button>
                         )}
                       </>
@@ -689,52 +660,82 @@ const Marketplace = () => {
           ) : (
             filterType === "tokenizing" && (
               <div className="">
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nftData?.map((suggestion, index) => (
-            <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden">
-              {
-                suggestion.seller === address && <img src={suggestion.image} alt="Flight Image" className="w-full h-32 object-cover"/>
-              }
-              
-              <div className="p-4">
-                <h3 className="text-lg font-bold mb-2">{suggestion.seller === address ? suggestion.title : "*********"}</h3>
-                <p>Date: {suggestion.seller === address ?suggestion.date : "*********"}</p>
-                <p>Flight Number: {suggestion.seller === address ?suggestion.flight.replace(/['"]/g, '') : "*********"}</p>
-                <>
-                        {suggestion?.seller === address ? (
-                          <>
-                            {!suggestion?.sold && (
-                              <button
-                                type="button"
-                                className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
-                                onClick={() => {
-                                  flightDelist(suggestion.id);
-                                }}
-                                disabled={flightDelistLoading}
-                              >
-                                {flightDelistLoading ? "Loading..." : "Delist"}
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <button
-                            type="button"
-                            className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
-                            onClick={() => {
-                              buyFlightNFT(suggestion);
-                            }}
-                            disabled={flightBuyLoading}
-                          >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {nftData?.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="bg-white shadow-md rounded-lg overflow-hidden"
+                    >
+                      {suggestion.seller === address && (
+                        <img
+                          src={suggestion.image}
+                          alt="Flight Image"
+                          className="w-full h-32 object-cover"
+                        />
+                      )}
 
-                            {flightBuyLoading ? "Loading..." : "Buy NFT"}
-                          </button>
-                        )}
-                      </>
-              </div>
-            </div>
-          ))}
-        </div>
-              
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-2">
+                          {suggestion.seller === address
+                            ? suggestion.title
+                            : "*********"}
+                        </h3>
+                        <p>
+                          Date:
+                          {suggestion.seller === address
+                            ? suggestion.date
+                            : "*********"}
+                        </p>
+                        <p>
+                          Flight Number:
+                          {suggestion.seller === address
+                            ? suggestion.flight.replace(/['"]/g, "")
+                            : "*********"}
+                        </p>
+                        <p>
+                          Price:
+                          {suggestion.price} ETH
+                        </p>
+                        <p>
+                          Royalty Fee:
+                          {suggestion.royaltyFee/100}
+                          %
+                        </p>
+                        <>
+                          {suggestion?.seller === address ? (
+                            <>
+                              {!suggestion?.sold && (
+                                <button
+                                  type="button"
+                                  className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                                  onClick={() => {
+                                    flightDelist(suggestion.id);
+                                  }}
+                                  disabled={!!flightDelistLoading}
+                                >
+                                  {flightDelistLoading === suggestion.id
+                                    ? "Loading..."
+                                    : "Delist"}
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <button
+                              type="button"
+                              className="bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg mt-4"
+                              onClick={() => {
+                                buyFlightNFT(suggestion);
+                              }}
+                              disabled={!!flightBuyLoading}
+                            >
+                              {flightBuyLoading === suggestion.id ? "Loading..." : "Buy NFT"}
+                            </button>
+                          )}
+                        </>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )
           )}
@@ -773,14 +774,14 @@ const Marketplace = () => {
   const buyDataNFT = async (flight) => {
     try {
       setBuyNftLoading(flight.id);
-      
+
       const marketContract = marketplaceIntegrateContract();
       if (address) {
         const totalPrice =
-        (parseFloat(flight.nameAmount) || 0) +
-        (parseFloat(flight.phoneAmount) || 0) +
-        (parseFloat(flight.locationAmount) || 0);
-      const valueInWei = web3.utils.toWei(totalPrice, "ether");
+          (parseFloat(flight.nameAmount) || 0) +
+          (parseFloat(flight.phoneAmount) || 0) +
+          (parseFloat(flight.locationAmount) || 0);
+        const valueInWei = web3.utils.toWei(totalPrice, "ether");
         await marketContract.methods
           .buyTokenNFT(dataNFTAddress, flight?.id)
           .send({ from: address, value: valueInWei, gas: 500000 });
@@ -796,10 +797,10 @@ const Marketplace = () => {
       setBuyNftLoading(null);
     }
   };
-  const flightDelist = async(flightId)=>{
-    try{
+  const flightDelist = async (flightId) => {
+    try {
       const marketContract = marketplaceIntegrateContract();
-      setFlightDelistLoading(true)
+      setFlightDelistLoading(flightId);
       if (address) {
         await marketContract.methods
           .delistCreatedNFT(dataNFTAddress, flightId)
@@ -810,21 +811,20 @@ const Marketplace = () => {
       } else {
         toast.error("Please Wallet Connect First!");
       }
-    }catch(e){
+    } catch (e) {
       console.log("e", e);
     } finally {
-      setFlightDelistLoading(false);
+      setFlightDelistLoading(null);
     }
-  }
-  const buyFlightNFT = async(flight)=>{
-    try{
-      
+  };
+  const buyFlightNFT = async (flight) => {
+    try {
       const marketContract = marketplaceIntegrateContract();
-      setFlightBuyLoading(true)
+      setFlightBuyLoading(flight.id);
       if (address) {
-        if(flight.seller === address){
+        if (flight.seller === address) {
           toast.error("You cannot buy your own Flight NFT");
-          return
+          return;
         }
         await marketContract.methods
           .buyCreatedNFT(dataNFTAddress, flight.id)
@@ -835,14 +835,13 @@ const Marketplace = () => {
       } else {
         toast.error("Please Wallet Connect First!");
       }
-    }catch(e){
+    } catch (e) {
       console.log("e", e);
     } finally {
-      setFlightBuyLoading(false);
+      setFlightBuyLoading(null);
     }
-  }
+  };
 
-  
   return (
     <div className="bg-gradient-to-r from-purple-200 to-gray-500 min-h-screen flex flex-col">
       <div className="bg-gradient-to-r from-purple-200 to-gray-500 main-content flex">

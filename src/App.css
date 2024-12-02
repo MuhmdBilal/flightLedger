@@ -57,3 +57,8 @@ footer {
     transform: rotate(360deg);
   }
 }
+.error-message{
+  color: rgb(240, 42, 42);
+  font-size: 14px;
+  margin-top: 6px;
+}
